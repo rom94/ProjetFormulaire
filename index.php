@@ -2,6 +2,7 @@
 	$firstname = $name = $email = $phone = $message = "";
 	$firstnameError = $nameError = $emailError = $phoneError = $messageError = "";
 	$isSuccess = false;
+	$emailTo = "romaindepage@gmail.com";
 
 	if ($_SERVER["REQUEST_METHOD"] == "POST") {
 		$firstname = verifyInput($_POST['firstname']);
@@ -10,29 +11,48 @@
 		$phone = verifyInput($_POST['phone']);
 		$message = verifyInput($_POST['message']);
 		$isSuccess = true;
+		$emailText = "";
 
 		if (empty($firstname)) {
 			$firstnameError = "Je veux connaître ton prénom !";
 			$isSuccess = false;
+		}else{
+			$emailText .= "Prénom: $firstname\n";
 		}
+
 		if (empty($name)) {
 			$nameError = "Et oui je veux tout savoir. Même ton nom !";
 			$isSuccess = false;
+		}else{
+			$emailText .= "Nom: $name\n";
 		}
-		if (empty($message)) {
-			$messageError = "Qu'est-ce que tu veux me dire ?";
-			$isSuccess = false;
-		}
+
 		if (!isEmail($email)) {
 			$emailError = "T'essaies de me rouler ? Ce n'est pas un email ça !";
 			$isSuccess = false;
+		}else{
+			$emailText .= "Email: $email\n";
 		}
+
 		if (!isPhone($phone)) {
 			$phoneError = "Que des chiffres et des espaces, stp...";
 			$isSuccess = false;
+		}else{
+			$emailText .= "Téléphone: $phone\n";
 		}
+
+		if (empty($message)) {
+			$messageError = "Qu'est-ce que tu veux me dire ?";
+			$isSuccess = false;
+		}else{
+			$emailText .= "Message: $message\n";
+		}
+
 		if ($isSuccess) {
 			//Envoi de l'email
+			$headers = "From: $firstname $name <$email>\r\nReply-To: $email";
+			mail($emailTo, "Message de votre site", $emailText, $headers);
+			$firstname = $name = $email = $phone = $message = "";
 		}
 
 	}
